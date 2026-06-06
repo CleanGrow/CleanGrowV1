@@ -1,57 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<title>Controle LED</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanGrow</title>
+
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<h2>Controle do LED</h2>
+    <header>
+        <h1>🌱 CleanGrow</h1>
+        <p>Agricultura Inteligente e Sustentável</p>
+    </header>
 
-<button id="btnLed">Carregando...</button>
+    <main>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {
-    getDatabase,
-    ref,
-    set,
-    onValue
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+        <a class="menu-card" href="pages/ambiente.html">
+            🌦 Ambiente
+        </a>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBqmTTuImI3XryQ9D2X-eJ1yNrFfKtwvpM",
-  authDomain: "cleangrow-8b552.firebaseapp.com",
-  databaseURL: "https://cleangrow-8b552-default-rtdb.firebaseio.com",
-  projectId: "cleangrow-8b552",
-  storageBucket: "cleangrow-8b552.firebasestorage.app",
-  messagingSenderId: "823736787199",
-  appId: "1:823736787199:web:26c85a9bf702422e186cca"
-};
+        <a class="menu-card" href="pages/composteira.html">
+            ♻ Composteira
+        </a>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+        <a class="menu-card" href="pages/minhocario.html">
+            🪱 Minhocário
+        </a>
 
-const ledRef = ref(db, "led/state");
-const btn = document.getElementById("btnLed");
+        <a class="menu-card" href="pages/reservatorio.html">
+            💧 Reservatório
+        </a>
 
-let estadoAtual = 0;
+        <a class="menu-card" href="pages/sistema.html">
+            ⚙ Sistema
+        </a>
 
-// Atualiza o botão quando o Firebase mudar
-onValue(ledRef, (snapshot) => {
-    estadoAtual = snapshot.val() || 0;
-
-    btn.textContent =
-        estadoAtual === 1
-        ? "Desligar LED"
-        : "Ligar LED";
-});
-
-// Alterna entre 0 e 1
-btn.addEventListener("click", () => {
-    set(ledRef, estadoAtual === 1 ? 0 : 1);
-});
-</script>
+    </main>
 
 </body>
+
 </html>
