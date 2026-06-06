@@ -129,39 +129,45 @@ onValue(ref(db, "stat_valv"), (snapshot) => {
 });
 
 // =======================
-// Botão Irrigar Agora (Modo Liga/Desliga)
+// BOTÃO IRRIGAR
 // =======================
 
-document.addEventListener("DOMContentLoaded", () => {
+const btn = document.getElementById("btnIrrigar");
 
-    const btn = document.getElementById("btnIrrigar");
-    if (!btn) return; // Garante que só roda na página de irrigação
+if (!btn) {
+    console.log("Botão não encontrado!");
+} else {
 
-    // Variável para guardar o estado atual vindo do banco
-    let irrigandoAtualmente = false;
-
-    // 1. AÇÃO DE CLICAR: Inverte o estado atual no Firebase
-    btn.addEventListener("click", () => {
-        // Se estava ligado (true/1), envia 0. Se estava desligado (false/0), envia 1.
-        const novoEstado = irrigandoAtualmente ? 0 : 1;
-        
-        set(ref(db, "stat_irrig"), novoEstado); 
-        set(ref(db, "stat_valv"), novoEstado); // Opcional: abre/fecha a válvula junto
-    });
-
-    // 2. ESCUTAR O BANCO: Atualiza o texto e estilo do botão
+    // 🔴 ESCUTA ESTADO REAL
     onValue(ref(db, "stat_irrig"), (snapshot) => {
-        irrigandoAtualmente = snapshot.val() == 1;
 
-        if (irrigandoAtualmente) {
-            // O botão fica ativo, mas com texto de interrupção
-            btn.disabled = false;
-            btn.textContent = "🛑 Parar Irrigação";
-            btn.style.background = "#d32f2f"; // Muda para vermelho (visual de parar)
+        const irrigando = Number(snapshot.val()) === 1;
+
+        console.log("stat_irrig:", snapshot.val());
+
+        if (irrigando) {
+
+            btn.disabled = true;
+            btn.textContent = "💧 Irrigando...";
+
         } else {
+
             btn.disabled = false;
-            btn.textContent = "Irrigar Agora";
-            btn.style.background = "#2E7D32"; // Volta para o verde padrão
+            btn.textContent = "💧 Irrigar Agora";
         }
     });
-});
+
+    // 🔵 CLIQUE ENVIA COMANDO PARA FIREBASE
+    btn.addEventListener("click", async () => {
+
+        console.log("Botão clicado");
+
+        try {
+            await set(ref(db, "cmd_irrig"), 1);
+            console.log("Comando enviado para Firebase");
+        } catch (err) {
+            console.error("Erro ao enviar:", err);
+        }
+
+    });
+}
