@@ -132,33 +132,18 @@ onValue(ref(db, "stat_valv"), (snapshot) => {
 // Botão Irrigar Agora
 // =======================
 
-const btn =
-    document.getElementById("btnIrrigar");
+const btn = document.getElementById("btnIrrigar");
 
 if (btn) {
 
-    let estadoAtual = 0;
+    btn.addEventListener("click", async () => {
 
-    const irrigRef =
-        ref(db, "res_irrig");
-
-    onValue(irrigRef, (snapshot) => {
-
-        estadoAtual =
-            snapshot.val() || 0;
-
-        btn.textContent =
-            estadoAtual == 1
-            ? "🛑 Parar Irrigação"
-            : "💧 Irrigar Agora";
-    });
-
-    btn.addEventListener("click", () => {
-
-        set(
-            irrigRef,
-            estadoAtual == 1 ? 0 : 1
+        await set(
+            ref(db, "cmd_irrig"),
+            1
         );
 
+        alert("Irrigação iniciada!");
     });
+
 }
