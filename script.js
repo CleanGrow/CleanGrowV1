@@ -129,50 +129,39 @@ onValue(ref(db, "stat_valv"), (snapshot) => {
 });
 
 // =======================
-// Botão Irrigar Agora
+// Botão Irrigar Agora (Modo Liga/Desliga)
 // =======================
 
 document.addEventListener("DOMContentLoaded", () => {
 
     const btn = document.getElementById("btnIrrigar");
+    if (!btn) return; // Garante que só roda na página de irrigação
 
-    let contador = null;
-    let tempo = 300;
+    // Variável para guardar o estado atual vindo do banco
+    let irrigandoAtualmente = false;
 
-onValue(ref(db, "stat_irrig"), (snapshot) => {
-    const irrigando = snapshot.val() == 1;
+    // 1. AÇÃO DE CLICAR: Inverte o estado atual no Firebase
+    btn.addEventListener("click", () => {
+        // Se estava ligado (true/1), envia 0. Se estava desligado (false/0), envia 1.
+        const novoEstado = irrigandoAtualmente ? 0 : 1;
+        
+        set(ref(db, "stat_irrig"), novoEstado); 
+        set(ref(db, "stat_valv"), novoEstado); // Opcional: abre/fecha a válvula junto
+    });
 
-    if (irrigando) {
+    // 2. ESCUTAR O BANCO: Atualiza o texto e estilo do botão
+    onValue(ref(db, "stat_irrig"), (snapshot) => {
+        irrigandoAtualmente = snapshot.val() == 1;
 
-        btn.disabled = true;
-
-        // evita múltiplos intervalos
-        if (contador) clearInterval(contador);
-
-        tempo = 300;
-        btn.textContent = `${tempo}s`;
-
-        contador = setInterval(() => {
-            tempo--;
-
-            btn.textContent = `${tempo}s`;
-
-            if (tempo <= 0) {
-                clearInterval(contador);
-                contador = null;
-            }
-        }, 1000);
-
-    } else {
-
-        btn.disabled = false;
-        btn.textContent = "Irrigar Agora";
-
-        if (contador) {
-            clearInterval(contador);
-            contador = null;
+        if (irrigandoAtualmente) {
+            // O botão fica ativo, mas com texto de interrupção
+            btn.disabled = false;
+            btn.textContent = "🛑 Parar Irrigação";
+            btn.style.background = "#d32f2f"; // Muda para vermelho (visual de parar)
+        } else {
+            btn.disabled = false;
+            btn.textContent = "Irrigar Agora";
+            btn.style.background = "#2E7D32"; // Volta para o verde padrão
         }
-    }
+    });
 });
-
-})
