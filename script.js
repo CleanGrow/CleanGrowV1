@@ -134,41 +134,41 @@ onValue(ref(db, "stat_valv"), (snapshot) => {
 
 const btn = document.getElementById("btnIrrigar");
 
-if (btn) {
+let contador = null;
+let tempo = 300;
 
-    btn.addEventListener("click", async () => {
+onValue(ref(db, "stat_irrig"), (snapshot) => {
+    const irrigando = snapshot.val() == 1;
 
-        const confirmar = confirm(
-            "Tem certeza que deseja iniciar a irrigação?"
-        );
-
-        if (!confirmar) return;
-
-        await set(ref(db, "cmd_irrig"), 1);
+    if (irrigando) {
 
         btn.disabled = true;
 
-        let tempo = 300; // 5 minutos
+        // evita múltiplos intervalos
+        if (contador) clearInterval(contador);
 
+        tempo = 300;
         btn.textContent = `${tempo}s`;
 
-        const contador = setInterval(() => {
-
+        contador = setInterval(() => {
             tempo--;
 
             btn.textContent = `${tempo}s`;
 
             if (tempo <= 0) {
-
                 clearInterval(contador);
-
-                btn.disabled = false;
-
-                btn.textContent = "Irrigar Agora";
+                contador = null;
             }
-
         }, 1000);
 
-    });
+    } else {
 
-}
+        btn.disabled = false;
+        btn.textContent = "💧 Irrigar Agora";
+
+        if (contador) {
+            clearInterval(contador);
+            contador = null;
+        }
+    }
+});
